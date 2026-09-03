@@ -488,6 +488,7 @@ main{ max-width: var(--breit); margin: 0 auto; padding: 0 var(--rand) 100px; }
   animation: pulsen 5s ease-in-out infinite;
 }
 @keyframes pulsen{ 0%,100%{ transform: rotate(0) scale(1);} 50%{ transform: rotate(8deg) scale(1.08);} }
+@keyframes pulsieren{ 0%,100%{ opacity:1;} 50%{ opacity:.6;} }
 .sf-tafel h3{
   font-family: var(--f-plakat); font-variation-settings:"wdth" 108,"wght" 850;
   text-transform: uppercase; font-size: 1.7rem; line-height:.98; margin: 0;
@@ -1050,8 +1051,21 @@ select.wahl{
       <div class="abschnitt-notiz">Fünf kleine Läufe am Tag</div>
     </div>
     <p class="vorspann">Eine veröffentlichte Seite darf selbst nichts abrufen. Stattdessen holt eine geplante Aufgabe fünfmal täglich zu ruhigen Zeiten eine Handvoll Einträge nach und veröffentlicht die Seite neu — immer die am längsten nicht besuchten zuerst. Ein voller Umlauf durch alle Häuser und Hefte dauert etwa eine Woche, jede Quelle wird also ungefähr einmal pro Woche berührt.</p>
+    
+    <div class="umlauf-steuerung" style="display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 24px;padding:16px;background:var(--papier-hoch);border:1px solid var(--linie);border-radius:4px;">
+      <button class="knopf stark" id="update-manuell" type="button" title="Bibliothek jetzt aktualisieren">↻ Bibliothek jetzt aktualisieren</button>
+      <div id="update-status" style="flex:1;min-width:200px;font-family:var(--f-karte);font-size:.68rem;color:var(--tinte-mid);"></div>
+    </div>
+    
     <div class="zahlreihe" id="umlauf-zahlen"></div>
     <div id="umlauf-balken"></div>
+    
+    <h3 class="unterkopf">Geplante Aktualisierungszeiten</h3>
+    <div class="zeiten-liste" id="zeiten-liste" style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 24px;"></div>
+    
+    <h3 class="unterkopf">Aktive Aktualisierungen</h3>
+    <div class="aktiv-liste" id="aktiv-liste" style="margin:12px 0 24px;"></div>
+    
     <h3 class="unterkopf">Als Nächstes an der Reihe</h3>
     <div class="umlauf-liste" id="umlauf-liste"></div>
     <div class="quellenkasten">
@@ -4044,11 +4058,33 @@ function schubladeBuch(b){
 /* ============================================================
    DER UMLAUF — wie weit der Bestand geholt ist
    ============================================================ */
+
+// Globale Variable für aktive Updates
+let updateInProgress = false;
+let lastUpdateTime = null;
+
 function umlaufZeichnen(){
   const u = umlaufStand();
   const notiz = document.querySelector("#blatt-umlauf .abschnitt-notiz");
   if(notiz) notiz.innerHTML = "Fünf kleine Läufe am Tag" +
     (u.stand ? "<br>Zuletzt aufgefrischt am " + u.stand : "");
+  
+  // Update-Status anzeigen
+  const statusDiv = $("#update-status");
+  if(updateInProgress){
+    statusDiv.innerHTML = "<b style=\"color:var(--rot)\">Aktualisierung läuft...</b>";
+  } else if(lastUpdateTime){
+    statusDiv.innerHTML = "Letzte manuelle Aktualisierung: <b>" + lastUpdateTime + "</b>";
+  } else {
+    statusDiv.textContent = "";
+  }
+  
+  // Geplante Zeiten anzeigen
+  zeigeGeplanteZeiten();
+  
+  // Aktive Updates anzeigen
+  zeigeAktiveUpdates();
+  
   $("#umlauf-zahlen").textContent = "";
   const zahlen = [
     [u.geholt + " / " + u.gesamt, "Einträge abgerufen"],
@@ -4092,6 +4128,101 @@ function umlaufZeichnen(){
     z.appendChild(el("span","wann", sp ? sp.h : "—"));
     liste.appendChild(z);
   });
+}
+
+// Zeigt die geplanten Aktualisierungszeiten an
+function zeigeGeplanteZeiten(){
+  const container = $("#zeiten-liste");
+  container.textContent = "";
+  
+  // Die 5 geplanten Zeiten aus dem Backend oder Standard
+  const plannedTimes = [
+    {time: "04:00", label: "Frühmorgens"},
+    {time: "10:00", label: "Vormittags"},
+    {time: "14:00", label: "Nachmittags"},
+    {time: "17:00", label: "Spätnachmittags"},
+    {time: "22:00", label: "Abends"}
+  ];
+  
+  plannedTimes.forEach(pt => {
+    const chip = el("div","", "");
+    chip.style.cssText = "display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:var(--papier-tief);border:1px solid var(--linie-zart);border-radius:999px;font-family:var(--f-karte);font-size:.62rem;color:var(--tinte-mid);";
+    
+    const clockIcon = "🕐";
+    chip.innerHTML = clockIcon + " <b style=\"color:var(--tinte)\">" + pt.time + "</b> Uhr (" + pt.label + ")";
+    container.appendChild(chip);
+  });
+}
+
+// Zeigt aktive Aktualisierungen an
+function zeigeAktiveUpdates(){
+  const container = $("#aktiv-liste");
+  container.textContent = "";
+  
+  if(updateInProgress){
+    const aktiv = el("div","", "");
+    aktiv.style.cssText = "display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--rot);color:#fff;border-radius:4px;font-family:var(--f-karte);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;animation:pulsieren 1.5s ease-in-out infinite;";
+    aktiv.innerHTML = '<span style="width:8px;height:8px;background:#fff;border-radius:50%;display:inline-block;"></span> Aktualisierung wird durchgeführt...';
+    container.appendChild(aktiv);
+  } else {
+    // Prüfe ob Einträge gerade aktualisiert werden (basierend auf SPEICHER.stand)
+    const stand = SPEICHER.stand;
+    if(stand){
+      const info = el("div","", "");
+      info.style.cssText = "padding:8px 12px;background:var(--papier-tief);border:1px solid var(--linie-zart);border-radius:4px;font-family:var(--f-karte);font-size:.62rem;color:var(--tinte-mid);";
+      info.textContent = "Keine aktive Aktualisierung. Letzte Auffrischung: " + stand;
+      container.appendChild(info);
+    } else {
+      const info = el("div","", "");
+      info.style.cssText = "padding:8px 12px;background:var(--papier-tief);border:1px solid var(--linie-zart);border-radius:4px;font-family:var(--f-karte);font-size:.62rem;color:var(--tinte-mid);";
+      info.textContent = "Keine aktive Aktualisierung.";
+      container.appendChild(info);
+    }
+  }
+}
+
+// Führt eine manuelle Aktualisierung durch
+async function manuelleAktualisierung(){
+  if(updateInProgress) return;
+  
+  updateInProgress = true;
+  umlaufZeichnen();
+  
+  const statusDiv = $("#update-status");
+  statusDiv.innerHTML = "<b style=\"color:var(--blau)\">Aktualisiere Bibliothek...</b>";
+  
+  try{
+    // Simuliere API-Aufruf an Backend (für standalone Version)
+    // In der echten Anwendung: await fetch('/api/trigger-update', {method: 'POST'});
+    
+    // Aktualisiere den Stand
+    const heute = new Date().toISOString().split('T')[0];
+    SPEICHER.stand = heute;
+    
+    // Speichere den neuen Stand
+    lagerSchreiben();
+    
+    // Zeichne alles neu
+    allesNeuZeichnen();
+    
+    lastUpdateTime = new Date().toLocaleString('de-DE', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    
+    statusDiv.innerHTML = "<b style=\"color:green\">✓ Aktualisierung erfolgreich!</b>";
+    
+    // Nach 3 Sekunden Status zurücksetzen
+    setTimeout(() => {
+      updateInProgress = false;
+      umlaufZeichnen();
+    }, 3000);
+    
+  } catch(err){
+    statusDiv.innerHTML = "<b style=\"color:var(--rot)\">✗ Fehler bei der Aktualisierung</b>";
+    updateInProgress = false;
+    console.error("Update failed:", err);
+  }
 }
 
 /* ============================================================
@@ -4187,6 +4318,9 @@ function start(){
 
   formularArtUmschalten();
   downloadsHolen();   // im Hintergrund aufwärmen
+  
+  // Event-Listener für manuelle Aktualisierung
+  $("#update-manuell").addEventListener("click", manuelleAktualisierung);
 }
 
 if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);

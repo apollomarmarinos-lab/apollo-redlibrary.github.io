@@ -1,0 +1,236 @@
+<style>
+/* ============================================================
+   DER TISCH — Neuerscheinungen, wöchentlich neu gelegt
+   ============================================================ */
+.tisch{
+  display:grid; gap: 0;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  background: var(--papier-hoch);
+  border: 1px solid var(--linie);
+  overflow: hidden;   /* kappt die Trennlinien der Randspalte */
+}
+.stueck{
+  position:relative; display:flex; flex-direction:column;
+  background: var(--papier-hoch);
+  padding: 16px 16px 14px;
+  text-align:left; cursor:pointer; border:0;
+  min-height: 216px;
+  box-shadow: 1px 0 0 var(--linie-zart), 0 1px 0 var(--linie-zart);
+  transition: background .16s ease, transform .16s cubic-bezier(.2,.9,.25,1);
+  animation: einlegen .42s cubic-bezier(.2,.9,.25,1) both;
+}
+@keyframes einlegen{
+  from{ opacity:.15; transform: translateY(9px) rotate(-.35deg); }
+  to  { opacity:1;   transform: none; }
+}
+.stueck:hover, .stueck:focus-visible{ background: var(--papier); z-index:3; }
+.stueck::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  border: 2px solid var(--rot); opacity:0;
+  transform: translate(4px,3px);
+  transition: opacity .18s ease, transform .28s cubic-bezier(.2,.9,.25,1);
+}
+.stueck:hover::before, .stueck:focus-visible::before{ opacity:1; transform: translate(0,0); }
+
+.stueck-kopf{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.art-marke{
+  font-family: var(--f-karte); font-size:.58rem; letter-spacing:.14em;
+  text-transform: uppercase; color: var(--papier-hoch);
+  background: var(--tinte); padding: 3px 6px 2px; flex:0 0 auto;
+}
+.art-marke.heft{ background: var(--blau); }
+.land-marke{
+  font-family: var(--f-karte); font-size:.62rem; letter-spacing:.12em;
+  color: var(--tinte-hell);
+}
+.stueck h3{
+  font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 100,"wght" 760;
+  font-size: 1.14rem; line-height:1.06; letter-spacing:-.012em;
+  margin: 13px 0 6px; text-wrap: balance;
+}
+.stueck .unter{
+  font-family: var(--f-lese); font-style: italic;
+  font-size:.86rem; color: var(--tinte-mid); margin: 0 0 auto;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.stueck-fuss{
+  display:flex; justify-content:space-between; align-items:flex-end; gap:8px;
+  margin-top: 14px; padding-top: 9px; border-top: 1px solid var(--linie-zart);
+  font-family: var(--f-karte); font-size:.63rem; letter-spacing:.05em;
+  color: var(--tinte-hell);
+}
+.stueck-fuss .ort{ text-transform: uppercase; letter-spacing:.09em; }
+
+.tier-punkt{
+  display:inline-flex; align-items:center; gap:5px;
+  font-family: var(--f-karte); font-size:.6rem; letter-spacing:.1em;
+  text-transform: uppercase;
+}
+.tier-punkt::before{
+  content:""; width:7px; height:7px; flex:0 0 auto;
+  background: var(--tinte-hell);
+}
+.tier-punkt.kern::before{ background: var(--rot); border-radius:50%; }
+.tier-punkt.haus::before{ background: var(--blau); }
+.tier-punkt.untergrund::before{
+  background: none; border: 1.5px solid var(--tinte-mid); transform: rotate(45deg);
+}
+
+/* ============================================================
+   DAS KERNREGAL — Buchrücken auf einem Brett
+   ============================================================ */
+.regalbrett{
+  position:relative; padding: 0 0 22px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
+}
+.ruecken-reihe{
+  display:flex; align-items:flex-end; gap: 5px;
+  padding: 34px 4px 0 2px; min-width: min-content;
+  perspective: 1200px;
+}
+.ruecken{
+  flex: 0 0 auto; position:relative;
+  width: 58px; height: 304px;
+  border:0; padding:0; cursor:pointer;
+  background: var(--tinte); color: var(--papier-hoch);
+  transform-origin: bottom center;
+  transition: transform .34s cubic-bezier(.22,.95,.3,1), box-shadow .34s ease, filter .2s ease;
+  box-shadow: 1px 0 0 rgba(0,0,0,.22) inset;
+  animation: einstellen .5s cubic-bezier(.2,.9,.25,1) both;
+}
+@keyframes einstellen{
+  from{ opacity:.2; transform: translateY(14px) rotate(-2deg); }
+  to  { opacity:1;  transform: none; }
+}
+.ruecken.ink-rot{ background: var(--rot); }
+.ruecken.ink-blau{ background: var(--blau); }
+.ruecken.ink-papier{ background: var(--papier-tief); color: var(--tinte); }
+.ruecken.breit{ width: 76px; }
+.ruecken.schmal{ width: 44px; }
+
+.ruecken:hover, .ruecken:focus-visible{
+  transform: translateY(-26px) rotateX(11deg) rotateZ(-1.4deg);
+  box-shadow: 0 16px 0 -8px var(--schatten), 1px 0 0 rgba(0,0,0,.22) inset;
+  z-index: 5;
+}
+.ruecken-text{
+  position:absolute; inset: 15px 0 46px;
+  writing-mode: vertical-rl; text-orientation: mixed;
+  display:flex; align-items:center; justify-content:flex-start;
+  font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 80,"wght" 730;
+  font-size: .76rem; letter-spacing: .012em;
+  text-transform: uppercase;
+  padding-top: 4px;
+  overflow:hidden;
+}
+.ruecken-kopfband{
+  position:absolute; left:0; right:0; top:0; height: 9px;
+  background: currentColor; opacity:.35;
+}
+.ruecken-fuss{
+  position:absolute; left:0; right:0; bottom:0;
+  padding: 6px 4px 7px; text-align:center;
+  border-top: 1px solid currentColor;
+}
+.ruecken-fuss .rest{
+  font-family: var(--f-karte); font-size:.52rem; letter-spacing:.04em;
+  opacity:.85; display:block; margin-bottom:4px;
+}
+.leiste{ display:flex; gap:2px; justify-content:center; }
+.leiste i{ width:5px; height:5px; background: currentColor; opacity:.28; }
+.leiste i.voll{ opacity:1; }
+.frisch-fahne{
+  position:absolute; top:-15px; left:50%; transform: translateX(-50%);
+  background: var(--rot); color:#fff;
+  font-family: var(--f-karte); font-size:.5rem; letter-spacing:.08em;
+  padding: 2px 5px 1px; white-space:nowrap; pointer-events:none;
+  animation: wippen 3.2s ease-in-out infinite;
+}
+@keyframes wippen{ 0%,100%{ transform: translateX(-50%) rotate(-3deg);} 50%{ transform: translateX(-50%) rotate(3deg);} }
+
+.brett{
+  height: 9px; background: var(--tinte);
+  box-shadow: 0 4px 0 -1px var(--schatten);
+  margin-top: -1px;
+}
+
+/* ============================================================
+   ZEITSCHRIFTENREGAL
+   ============================================================ */
+.hefte-liste{ display:flex; flex-direction:column; border-top:1px solid var(--linie); }
+.heft-zeile{
+  display:grid; align-items:center; gap: 14px;
+  grid-template-columns: 46px minmax(0,2.1fr) minmax(0,1.5fr) 128px 96px;
+  padding: 12px 10px 12px 6px;
+  border-bottom: 1px solid var(--linie-zart);
+  background:none; border-left:0; border-right:0; border-top:0;
+  text-align:left; cursor:pointer; width:100%;
+  transition: background .15s ease, padding-left .18s ease;
+  animation: einlegen .34s cubic-bezier(.2,.9,.25,1) both;
+}
+.heft-zeile:hover, .heft-zeile:focus-visible{ background: var(--papier-hoch); padding-left: 14px; }
+.heft-nr{
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 88,"wght" 800;
+  font-size: 1.02rem; color: var(--rot); text-align:right;
+  font-variant-numeric: tabular-nums;
+}
+.heft-nr small{ display:block; font-size:.5rem; letter-spacing:.1em; color: var(--tinte-hell); font-variation-settings:"wdth" 100,"wght" 600; }
+.heft-name{ font-family: var(--f-plakat); font-variation-settings:"wdth" 100,"wght" 740; font-size: 1.01rem; line-height:1.15; }
+.heft-name span{ display:block; font-family: var(--f-lese); font-style:italic; font-weight:400; font-size:.8rem; color: var(--tinte-mid); margin-top:2px; }
+.heft-hrsg{ font-size:.84rem; color: var(--tinte-mid); }
+.heft-rhythmus{ font-family: var(--f-karte); font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color: var(--tinte-mid); }
+.heft-stand{ text-align:right; font-family: var(--f-karte); font-size:.62rem; letter-spacing:.05em; color: var(--tinte-hell); }
+
+.marke{
+  display:inline-block; padding: 2px 6px 1px;
+  font-family: var(--f-karte); font-size:.55rem; letter-spacing:.11em; text-transform: uppercase;
+}
+.marke.neu{ background: var(--rot); color:#fff; }
+.marke.bald{ background: var(--blau); color:#fff; }
+.marke.archiv{ background: var(--papier-tief); color: var(--tinte-mid); border:1px solid var(--linie); }
+
+@media (max-width: 860px){
+  .heft-zeile{ grid-template-columns: 42px minmax(0,1fr) 92px; }
+  .heft-hrsg, .heft-rhythmus{ display:none; }
+}
+
+/* ============================================================
+   SCHAUFENSTER
+   ============================================================ */
+.schaufenster{
+  border: 3px solid var(--tinte); position:relative;
+  background: var(--papier-hoch);
+  display:grid; grid-template-columns: minmax(0,300px) minmax(0,1fr);
+}
+@media (max-width: 780px){ .schaufenster{ grid-template-columns: 1fr; } }
+.sf-tafel{
+  padding: 26px 24px; border-right: 3px solid var(--tinte);
+  background: var(--tinte); color: var(--papier-hoch);
+  display:flex; flex-direction:column; justify-content:space-between; gap:20px;
+}
+@media (max-width: 780px){ .sf-tafel{ border-right:0; border-bottom:3px solid var(--tinte); } }
+.sf-zeichen{
+  font-size: 3.4rem; line-height:1; color: var(--rot);
+  animation: pulsen 5s ease-in-out infinite;
+}
+@keyframes pulsen{ 0%,100%{ transform: rotate(0) scale(1);} 50%{ transform: rotate(8deg) scale(1.08);} }
+.sf-tafel h3{
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 108,"wght" 850;
+  text-transform: uppercase; font-size: 1.7rem; line-height:.98; margin: 0;
+  letter-spacing:-.015em;
+}
+.sf-inhalt{ padding: 20px 22px; display:flex; flex-wrap:wrap; gap: 8px; align-content:flex-start; }
+.chip{
+  border:1px solid var(--linie); background: var(--papier);
+  padding: 6px 11px 5px; cursor:pointer;
+  font-family: var(--f-karte); font-size:.68rem; letter-spacing:.03em;
+  transition: transform .16s cubic-bezier(.2,.9,.25,1), background .16s ease, border-color .16s ease;
+  animation: einlegen .3s cubic-bezier(.2,.9,.25,1) both;
+}
+.chip:hover{ background: var(--tinte); color: var(--papier-hoch); border-color: var(--tinte); transform: translate(-2px,-2px); }
+.chip b{ font-weight:600; }
+.chip .mini{ color: var(--tinte-hell); }
+.chip:hover .mini{ color: var(--papier-tief); }
+</style>

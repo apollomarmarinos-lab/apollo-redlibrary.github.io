@@ -1,0 +1,136 @@
+<style>
+/* ============================================================
+   TITEL, AUSGABEN, UMLAUF
+   ============================================================ */
+.art-marke.buch{ background: var(--rot); color:#fff; }
+.stueck.buch h3{ font-size: 1.06rem; }
+.stueck.buch .unter{ font-style: normal; font-family: var(--f-karte); font-size:.72rem;
+  letter-spacing:.03em; color: var(--tinte-mid); -webkit-line-clamp:2; }
+
+/* Buchrücken: Titel und Verfasser:in untereinander im Vertikalsatz */
+.ruecken-text{ gap: 11px; }
+/* Vertikalsatz: die "Zeilenlänge" ist die Höhe des Rückens. Einzeilig halten
+   und zu lange Titel abschneiden — vollständig stehen sie in der Schublade. */
+.ruecken-text b, .ruecken-text i{
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-height: 0; max-height: 100%; flex: 0 1 auto;
+}
+.ruecken-text b{ font-weight: inherit; font-variation-settings:"wdth" 80,"wght" 760; }
+.ruecken-text i{ font-style: normal; font-size:.72em; opacity:.7;
+  font-variation-settings:"wdth" 86,"wght" 500; flex: 0 0 auto; }
+
+/* ---------- Kiosk ---------- */
+.kiosk{
+  display:grid; gap:0; grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
+  border:1px solid var(--linie); background: var(--papier-hoch); overflow:hidden;
+}
+.ausgabe{
+  padding: 18px 18px 14px; cursor:pointer;
+  box-shadow: 1px 0 0 var(--linie-zart), 0 1px 0 var(--linie-zart);
+  transition: background .16s ease;
+  animation: einlegen .4s cubic-bezier(.2,.9,.25,1) both;
+}
+.ausgabe:hover, .ausgabe:focus-visible{ background: var(--papier); }
+.ausgabe-kopf{ display:flex; gap:14px; align-items:flex-start; }
+.ausgabe-nr{ flex:0 0 auto; text-align:center; border-right:1px solid var(--linie-zart); padding-right:13px; }
+.ausgabe-nr b{
+  display:block; font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 90,"wght" 830; font-size:1.02rem; color: var(--rot);
+  font-variant-numeric: tabular-nums; white-space:nowrap;
+}
+.ausgabe-nr span{ display:block; font-family: var(--f-karte); font-size:.55rem;
+  letter-spacing:.08em; text-transform:uppercase; color: var(--tinte-hell); margin-top:2px; white-space:nowrap; }
+.ausgabe-titel h3{
+  margin:0; font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 102,"wght" 780; font-size:1.06rem; line-height:1.1;
+}
+.ausgabe-titel .thema{ margin:3px 0 0; font-style:italic; font-size:.85rem; color: var(--tinte-mid); }
+.ausgabe .inhalt{ list-style:none; margin:14px 0 0; padding:0; }
+.ausgabe .inhalt li{
+  padding: 6px 0 6px 14px; position:relative;
+  border-top:1px solid var(--linie-zart); font-size:.87rem; line-height:1.35;
+}
+.ausgabe .inhalt li::before{ content:"·"; position:absolute; left:3px; color: var(--rot); font-weight:700; }
+.ausgabe .inhalt .aufsatz{ display:block; }
+.ausgabe .inhalt .verfasser{
+  display:block; font-family: var(--f-karte); font-size:.62rem;
+  letter-spacing:.06em; text-transform:uppercase; color: var(--tinte-hell); margin-top:1px;
+}
+.ausgabe-fuss{
+  margin-top:12px; padding-top:8px; border-top:1px solid var(--linie-zart);
+  font-family: var(--f-karte); font-size:.58rem; letter-spacing:.05em; color: var(--tinte-hell);
+}
+
+/* ---------- Werklisten in der Schublade ---------- */
+.werkliste{ list-style:none; padding:0; margin:6px 0 0; }
+.werkliste li{ padding: 7px 0 7px 15px; position:relative; border-bottom:1px solid var(--linie-zart); }
+.werkliste li::before{ content:"—"; position:absolute; left:0; color: var(--rot); }
+.werkliste .werk{ display:block; font-size:.95rem; line-height:1.35; }
+.werkliste .werk-unter{
+  display:block; font-family: var(--f-karte); font-size:.62rem;
+  letter-spacing:.06em; text-transform:uppercase; color: var(--tinte-hell); margin-top:2px;
+}
+.quellzeile{
+  margin: 9px 0 0; font-family: var(--f-karte); font-size:.62rem;
+  letter-spacing:.04em; color: var(--tinte-hell); line-height:1.5;
+}
+.verlagslink{
+  border:0; background:none; padding:0; cursor:pointer; text-align:left;
+  font-family: var(--f-lese); font-size:.95rem; color: var(--rot);
+  border-bottom:1px solid currentColor;
+}
+.verlagslink:hover{ color: var(--tinte); }
+
+/* ---------- Umlauf ---------- */
+.zahlreihe{
+  display:grid; gap:1px; background: var(--linie-zart);
+  grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+  border:1px solid var(--linie); margin-bottom: 20px;
+}
+.zahlkachel{ background: var(--papier-hoch); padding: 16px 16px 14px; }
+.zahlkachel b{
+  display:block; font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 96,"wght" 850; font-size: 1.7rem; line-height:1;
+  font-variant-numeric: tabular-nums; color: var(--tinte);
+}
+.zahlkachel span{
+  display:block; margin-top:5px; font-family: var(--f-karte); font-size:.6rem;
+  letter-spacing:.09em; text-transform:uppercase; color: var(--tinte-hell);
+}
+.balken{ height: 10px; background: var(--papier-tief); border:1px solid var(--linie); overflow:hidden; }
+.balken i{
+  display:block; height:100%; background: var(--rot);
+  transition: width 1.2s cubic-bezier(.2,.9,.25,1);
+}
+.unterkopf{
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 106,"wght" 800;
+  text-transform:uppercase; font-size:.9rem; letter-spacing:.03em;
+  margin: 34px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--linie);
+}
+.umlauf-liste{ display:flex; flex-direction:column; border-top:1px solid var(--linie-zart); }
+.umlauf-zeile{
+  display:flex; align-items:center; gap:12px; padding:9px 6px;
+  border-bottom:1px solid var(--linie-zart);
+}
+.umlauf-zeile .wer{ flex:1 1 auto; min-width:0; }
+.umlauf-zeile .wer b{ font-family:var(--f-plakat); font-weight:normal;
+  font-variation-settings:"wdth" 100,"wght" 700; font-size:.95rem; }
+.umlauf-zeile .wer span{ display:block; font-family:var(--f-karte); font-size:.58rem;
+  letter-spacing:.07em; text-transform:uppercase; color: var(--tinte-hell); }
+.umlauf-zeile .wann{ font-family:var(--f-karte); font-size:.62rem; color: var(--tinte-hell);
+  flex:0 0 auto; font-variant-numeric: tabular-nums; }
+.marke.warte{ background: var(--papier-tief); color: var(--tinte-mid); border:1px dashed var(--linie); }
+
+.quellenkasten{ border:1px solid var(--linie); background: var(--papier-hoch); padding: 20px 22px; margin-top: 34px; }
+.quellen{ margin:0; }
+.quellen div{ display:grid; grid-template-columns: 220px minmax(0,1fr); gap:14px;
+  padding:10px 0; border-bottom:1px solid var(--linie-zart); }
+.quellen div:last-child{ border-bottom:0; }
+.quellen dt{ font-family: var(--f-karte); font-size:.63rem; letter-spacing:.07em;
+  text-transform:uppercase; color: var(--tinte); margin:0; padding-top:2px; }
+.quellen dd{ margin:0; font-size:.9rem; color: var(--tinte-mid); line-height:1.5; }
+@media (max-width: 700px){ .quellen div{ grid-template-columns: 1fr; gap:4px; } }
+</style>
+<style>
+.umlauf-zeile.dran{ background: var(--papier-hoch); box-shadow: inset 3px 0 0 var(--rot); padding-left:12px; }
+</style>

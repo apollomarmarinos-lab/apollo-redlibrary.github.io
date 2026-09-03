@@ -1,0 +1,344 @@
+<div class="huelle">
+
+<header class="masthead">
+  <div class="masthead-innen">
+    <div class="laufzeile karte">
+      <span id="datumszeile">—</span>
+      <span><b id="bestandszahl">—</b> Titel im Bestand · <b id="landzahl">—</b> Länder</span>
+    </div>
+    <div class="titelzeile">
+      <h1 class="schild" data-echo="Rotes Regal">Rotes Regal</h1>
+      <p class="untertitel">Eine Buchhandlung, die sich selbst umräumt.<br>Verlage und Zeitschriften der Linken aus dem deutsch-, englisch- und französischsprachigen Raum.</p>
+    </div>
+    <nav class="regalreiter" role="tablist" aria-label="Regale">
+      <button class="reiter" role="tab" data-blatt="laden"   aria-selected="true">Der Laden</button>
+      <button class="reiter" role="tab" data-blatt="titel"   aria-selected="false">Titel<span class="zaehler" id="z-titel"></span></button>
+      <button class="reiter" role="tab" data-blatt="hefte"   aria-selected="false">Zeitschriften<span class="zaehler" id="z-hefte"></span></button>
+      <button class="reiter" role="tab" data-blatt="verlage" aria-selected="false">Verlage<span class="zaehler" id="z-verlage"></span></button>
+      <button class="reiter" role="tab" data-blatt="antiquariat" aria-selected="false">Antiquariat<span class="zaehler" id="z-archiv"></span></button>
+      <button class="reiter" role="tab" data-blatt="umlauf"  aria-selected="false">Umlauf</button>
+      <button class="reiter" role="tab" data-blatt="bestand" aria-selected="false">Bestand pflegen</button>
+    </nav>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <span class="ticker-marke">Wühltisch heute</span>
+  <div class="ticker-bahn"><div class="ticker-lauf" id="tickerlauf"></div></div>
+</div>
+
+<main>
+
+<!-- ============================ DER LADEN ============================ -->
+<section class="blatt" id="blatt-laden">
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Der <em>Tisch</em></h2>
+      <div class="abschnitt-notiz">Wird jeden Montag neu gelegt<br><span id="tisch-alter"></span></div>
+    </div>
+    <p class="vorspann">Zwölf Neuerscheinungen, die diese Woche vorne liegen — echte Titel aus den Nationalbibliotheken und von den Verlagsseiten. Höchstens zwei je Haus, damit kein Verlag den Tisch besetzt.</p>
+    <div class="tisch" id="tisch"></div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Das <em>Kernregal</em></h2>
+      <div class="abschnitt-notiz">Rückt alle 28 Tage um zwei Plätze<br><span id="kern-rest"></span></div>
+    </div>
+    <p class="vorspann">Acht Bücher aus dem Rückenbestand der Häuser — dieselbe Bibliotheksabfrage, nur mit Jahresdeckel, also das, was seit Jahrzehnten lieferbar geblieben ist. Das Regal ist ein Förderband: pro Zyklus rücken zwei Titel nach, sechs bleiben stehen. Unten am Rücken steht das Erscheinungsjahr.</p>
+    <div class="regalbrett">
+      <div class="ruecken-reihe" id="kernregal"></div>
+      <div class="brett"></div>
+    </div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Frisch am <em>Kiosk</em></h2>
+      <div class="abschnitt-notiz">Zuletzt erschienene Ausgaben<br><span id="kiosk-zahl"></span></div>
+    </div>
+    <p class="vorspann">Wo eine Zeitschrift über Crossref oder ihre eigene Seite erreichbar ist, steht hier die tatsächliche Ausgabe mitsamt Inhaltsverzeichnis — nicht die berechnete.</p>
+    <div class="kiosk" id="kiosk"></div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Das <em>Schaufenster</em></h2>
+      <div class="abschnitt-notiz">Neues Thema jeden Montag</div>
+    </div>
+    <div class="schaufenster">
+      <div class="sf-tafel">
+        <div>
+          <div class="sf-zeichen" id="sf-zeichen">✦</div>
+          <h3 id="sf-titel">—</h3>
+        </div>
+        <p class="karte" style="margin:0;color:var(--papier-tief);opacity:.75" id="sf-zahl"></p>
+      </div>
+      <div class="sf-inhalt" id="sf-inhalt"></div>
+    </div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Der <em>Taktgeber</em></h2>
+      <div class="abschnitt-notiz">Alles rechnet sich aus dem Datum</div>
+    </div>
+    <p class="vorspann">Der Laden braucht keinen Server. Was du siehst, ergibt sich vollständig aus dem heutigen Datum — wer am selben Tag hereinkommt, sieht dasselbe Regal.</p>
+    <div class="taktgeber" id="taktgeber"></div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Greif ins <em>Regal</em></h2>
+      <div class="abschnitt-notiz">Blind gezogen</div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="knopf stark" id="griff">Zufällig etwas herausziehen</button>
+      <span class="karte" style="color:var(--tinte-hell)" id="griff-hinweis">Öffnet einen beliebigen Titel aus dem Bestand.</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================ ZEITSCHRIFTEN ============================ -->
+<section class="blatt" id="blatt-hefte" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Das <em>Zeitschriftenregal</em></h2>
+      <div class="abschnitt-notiz">Sortiert nach der nächsten Ausgabe</div>
+    </div>
+    <p class="vorspann">Jedes Heft rotiert in seinem eigenen Rhythmus — täglich, wöchentlich, monatlich, quartalsweise, oder wann immer es fertig wird. Wo ein Ausgabenstand belegt ist, zählt der Laden die Heftnummer selbst weiter.</p>
+    <div class="werkzeugleiste">
+      <div class="suchfeld"><span>↳</span><input type="search" id="suche-hefte" placeholder="Heft, Herausgeber, Ort …" aria-label="Zeitschriften durchsuchen"></div>
+      <select class="wahl" id="filter-heft-rhythmus" aria-label="Nach Rhythmus filtern"></select>
+      <select class="wahl" id="filter-heft-land" aria-label="Nach Land filtern"></select>
+      <select class="wahl" id="filter-heft-strang" aria-label="Nach Strang filtern"></select>
+      <select class="wahl" id="filter-heft-tier" aria-label="Nach Größe filtern"></select>
+    </div>
+    <div class="ergebniszeile" id="ergebnis-hefte"></div>
+    <div class="hefte-liste" id="hefte-liste"></div>
+  </div>
+</section>
+
+<!-- ============================ VERLAGE ============================ -->
+<section class="blatt" id="blatt-verlage" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Die <em>Verlage</em></h2>
+      <div class="abschnitt-notiz">Alphabetisch, wenn nicht anders sortiert</div>
+    </div>
+    <p class="vorspann">Von Häusern mit hundert Jahren Geschichte bis zu Kollektiven, die ihre Bücher am Küchentisch setzen. Der Punkt neben jedem Namen zeigt, wo im Feld ein Verlag steht.</p>
+    <div class="werkzeugleiste">
+      <div class="suchfeld"><span>↳</span><input type="search" id="suche-verlage" placeholder="Verlag, Stadt, Reihe …" aria-label="Verlage durchsuchen"></div>
+      <select class="wahl" id="filter-verlag-land" aria-label="Nach Land filtern"></select>
+      <select class="wahl" id="filter-verlag-strang" aria-label="Nach Strang filtern"></select>
+      <select class="wahl" id="filter-verlag-tier" aria-label="Nach Größe filtern"></select>
+      <select class="wahl" id="sortierung-verlage" aria-label="Sortierung">
+        <option value="az">A → Z</option>
+        <option value="jahr">Nach Gründungsjahr</option>
+        <option value="jahr-neu">Jüngste zuerst</option>
+        <option value="land">Nach Land</option>
+      </select>
+    </div>
+    <div class="ergebniszeile" id="ergebnis-verlage"></div>
+    <div class="tisch" id="verlage-liste"></div>
+  </div>
+</section>
+
+<!-- ============================ ANTIQUARIAT ============================ -->
+<section class="blatt" id="blatt-antiquariat" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Das <em>Antiquariat</em></h2>
+      <div class="abschnitt-notiz">Eingestellt, aber nicht vergessen</div>
+    </div>
+    <p class="vorspann">Zeitschriften, die es nicht mehr gibt. Fast alle haben ihr Archiv online gelassen — was in einem Regal, das sich ständig umräumt, das Mindeste an Nachruf ist.</p>
+    <div class="tisch" id="antiquariat-liste"></div>
+  </div>
+</section>
+
+<!-- ============================ TITEL ============================ -->
+<section class="blatt" id="blatt-titel" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Alle <em>Titel</em></h2>
+      <div class="abschnitt-notiz">Wächst mit jedem Abruf</div>
+    </div>
+    <p class="vorspann">Jedes Buch hier ist ein Nachweis aus einem Bibliothekskatalog oder von der Seite des Hauses — nichts davon ist von Hand eingetragen. Der Bestand füllt sich portionsweise weiter.</p>
+    <div class="werkzeugleiste">
+      <div class="suchfeld"><span>↳</span><input type="search" id="suche-titel" placeholder="Titel, Autor:in, Verlag …" aria-label="Titel durchsuchen"></div>
+      <select class="wahl" id="filter-titel-herkunft" aria-label="Nach Herkunft filtern">
+        <option value="alle">Neu und Rückenbestand</option>
+        <option value="neu">Nur Neuerscheinungen</option>
+        <option value="ruecken">Nur Rückenbestand</option>
+      </select>
+      <select class="wahl" id="filter-titel-land" aria-label="Nach Land filtern"></select>
+      <select class="wahl" id="sortierung-titel" aria-label="Sortierung">
+        <option value="neu">Jüngste zuerst</option>
+        <option value="alt">Älteste zuerst</option>
+        <option value="az">A → Z</option>
+        <option value="verlag">Nach Verlag</option>
+      </select>
+    </div>
+    <div class="ergebniszeile" id="ergebnis-titel"></div>
+    <div class="tisch" id="titel-liste"></div>
+  </div>
+</section>
+
+<!-- ============================ UMLAUF ============================ -->
+<section class="blatt" id="blatt-umlauf" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Der <em>Umlauf</em></h2>
+      <div class="abschnitt-notiz">Fünf kleine Läufe am Tag</div>
+    </div>
+    <p class="vorspann">Eine veröffentlichte Seite darf selbst nichts abrufen. Stattdessen holt eine geplante Aufgabe fünfmal täglich zu ruhigen Zeiten eine Handvoll Einträge nach und veröffentlicht die Seite neu — immer die am längsten nicht besuchten zuerst. Ein voller Umlauf durch alle Häuser und Hefte dauert etwa eine Woche, jede Quelle wird also ungefähr einmal pro Woche berührt.</p>
+    <div class="zahlreihe" id="umlauf-zahlen"></div>
+    <div id="umlauf-balken"></div>
+    <h3 class="unterkopf">Als Nächstes an der Reihe</h3>
+    <div class="umlauf-liste" id="umlauf-liste"></div>
+    <div class="quellenkasten">
+      <h3 class="unterkopf" style="margin-top:0">Woher die Titel kommen</h3>
+      <dl class="quellen">
+        <div><dt>Deutsche Nationalbibliothek</dt><dd>SRU-Schnittstelle. Durch das Pflichtexemplar praktisch vollständig für Verlage in Deutschland, Österreich und der Schweiz. Mehrere Häuser lassen sich in einer Abfrage bündeln.</dd></div>
+        <div><dt>Bibliothèque nationale de France</dt><dd>SRU-Schnittstelle für die französischsprachigen Häuser. Verlangt eine Nachfilterung, weil die Verlagssuche unscharf trifft.</dd></div>
+        <div><dt>Crossref</dt><dd>Liefert für Zeitschriften mit DOI die aktuelle Ausgabe samt Inhaltsverzeichnis. Mehrere ISSN gehen in einer Abfrage.</dd></div>
+        <div><dt>Verlags- und Zeitschriftenseiten</dt><dd>Für die anglophonen Häuser, die in keinem offenen Bibliothekskatalog abfragbar sind. Wer automatisierte Zugriffe abwehrt, wird vermerkt und in Ruhe gelassen.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ BESTAND ============================ -->
+<section class="blatt" id="blatt-bestand" hidden>
+  <div class="abschnitt" style="margin-top:34px">
+    <div class="abschnitt-kopf">
+      <h2>Bestand <em>pflegen</em></h2>
+      <div class="abschnitt-notiz">Bleibt in diesem Browser</div>
+    </div>
+    <p class="vorspann">Trag ein, was fehlt. Neue Einträge nehmen sofort an der Rotation teil — wer als „Kern“ eingestuft wird, kommt ins Kernregal, wer einen Rhythmus bekommt, ins Zeitschriftenregal. Änderungen liegen nur in deinem Browser; über <b>Sichern</b> holst du sie als Datei heraus.</p>
+
+    <form id="eintragsformular" class="formular" autocomplete="off">
+      <input type="hidden" id="f-id">
+      <div class="feld">
+        <label for="f-art">Art</label>
+        <select id="f-art" class="wahl" style="padding:9px 30px 9px 11px">
+          <option value="verlag">Verlag</option>
+          <option value="heft">Zeitschrift / Heft</option>
+        </select>
+      </div>
+      <div class="feld"><label for="f-name">Name</label><input id="f-name" required placeholder="z. B. Edition Kollektiv"></div>
+      <div class="feld"><label for="f-ort">Ort</label><input id="f-ort" placeholder="z. B. Leipzig"></div>
+      <div class="feld">
+        <label for="f-land">Land</label>
+        <select id="f-land" class="wahl" style="padding:9px 30px 9px 11px">
+          <option>DE</option><option>AT</option><option>CH</option><option>FR</option>
+          <option>UK</option><option>US</option><option>CA</option><option>NL</option>
+          <option>IT</option><option>ES</option><option>IN</option><option>ZA</option>
+        </select>
+      </div>
+      <div class="feld"><label for="f-jahr">Gegründet</label><input id="f-jahr" type="number" min="1500" max="2100" placeholder="2024"></div>
+      <div class="feld">
+        <label for="f-tier">Einordnung</label>
+        <select id="f-tier" class="wahl" style="padding:9px 30px 9px 11px">
+          <option value="untergrund">Untergrund — klein, unabhängig</option>
+          <option value="haus">Haus — etabliert</option>
+          <option value="kern">Kern — gehört ins Kernregal</option>
+        </select>
+        <span class="hinweis">Kern rotiert langsam, Untergrund kommt öfter auf den Tisch.</span>
+      </div>
+
+      <div class="feld" id="feld-hrsg"><label for="f-hrsg">Herausgeber / Verlag</label><input id="f-hrsg" placeholder="z. B. Eigenverlag"></div>
+      <div class="feld" id="feld-unter"><label for="f-unter">Untertitel</label><input id="f-unter" placeholder="z. B. Zeitschrift für …"></div>
+
+      <div class="feld" id="feld-rhythmus">
+        <label for="f-rhythmus">Erscheinungsrhythmus</label>
+        <select id="f-rhythmus" class="wahl" style="padding:9px 30px 9px 11px">
+          <option value="0">— (nur Verlag)</option>
+          <option value="300">täglich</option>
+          <option value="52">wöchentlich</option>
+          <option value="12">monatlich</option>
+          <option value="6">zweimonatlich</option>
+          <option value="4">vierteljährlich</option>
+          <option value="3">dreimal im Jahr</option>
+          <option value="2">halbjährlich</option>
+          <option value="1">jährlich</option>
+          <option value="-1">unregelmäßig</option>
+        </select>
+      </div>
+      <div class="feld"><label for="f-url">Website</label><input id="f-url" type="url" placeholder="https://…"></div>
+
+      <div class="feld weit">
+        <label>Stränge</label>
+        <div class="strangwahl" id="f-straenge"></div>
+      </div>
+      <div class="feld weit">
+        <label for="f-txt">Regalzettel</label>
+        <textarea id="f-txt" placeholder="Zwei, drei Sätze, warum der Titel hier steht."></textarea>
+        <span class="hinweis">Steht später im Detailblatt — schreib es so, wie du es jemandem im Laden sagen würdest.</span>
+      </div>
+      <div class="feld weit">
+        <label for="f-bek">Bekannt für <span style="text-transform:none;letter-spacing:0">(eine Zeile je Eintrag)</span></label>
+        <textarea id="f-bek" style="min-height:64px" placeholder="Reihe X&#10;Buch Y"></textarea>
+      </div>
+
+      <div class="feld weit" style="flex-direction:row;flex-wrap:wrap;gap:8px">
+        <button type="submit" class="knopf stark" id="speichern">In den Bestand aufnehmen</button>
+        <button type="button" class="knopf leise" id="formular-leeren">Formular leeren</button>
+      </div>
+    </form>
+
+    <div id="bestand-meldung"></div>
+  </div>
+
+  <div class="abschnitt">
+    <div class="abschnitt-kopf">
+      <h2>Eigene <em>Einträge</em></h2>
+      <div class="abschnitt-notiz"><span id="eigen-zahl">0</span> geändert oder ergänzt</div>
+    </div>
+    <div class="werkzeugleiste" style="border-bottom:0;padding-bottom:4px">
+      <button class="knopf" id="sichern">Bestand sichern (.json)</button>
+      <button class="knopf" id="einlesen-knopf">Bestand einlesen</button>
+      <input type="file" id="einlesen" accept="application/json,.json" hidden>
+      <button class="knopf leise" id="zuruecksetzen">Alles zurücksetzen</button>
+    </div>
+    <div class="bestandsliste" id="eigen-liste"></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="ladenfuss">
+  <div class="ladenfuss-innen">
+    <p>Rotes Regal · ein Regal, das sich selbst umräumt.<br>
+      Der Bestand ist kuratiert, nicht vollständig, und sicher streitbar — <br>was in einer linken Buchhandlung ungefähr der Normalzustand ist.</p>
+    <p style="text-align:right">
+      Kernregal rückt alle 28 Tage · Tisch wöchentlich · Wühltisch täglich<br>
+      Heftnummern werden aus belegten Ausgabenständen fortgezählt und sind Schätzungen.<br>
+      <span id="fuss-datum"></span>
+    </p>
+  </div>
+</footer>
+
+<!-- ============================ SCHUBLADE ============================ -->
+<div class="schublade" id="schublade" hidden role="dialog" aria-modal="true" aria-labelledby="sch-titel">
+  <button class="schublade-schleier" id="schleier" aria-label="Schließen" tabindex="-1"></button>
+  <div class="schublade-blatt">
+    <div class="sch-oben">
+      <div>
+        <span class="art-marke" id="sch-art">Verlag</span>
+        <span class="land-marke" id="sch-land" style="margin-left:8px"></span>
+      </div>
+      <button class="schliessen" id="schliessen" aria-label="Schublade schließen">✕</button>
+    </div>
+    <h2 class="sch-titel" id="sch-titel">—</h2>
+    <p class="sch-unter" id="sch-unter"></p>
+    <p class="sch-text" id="sch-text"></p>
+    <dl class="datenblatt" id="sch-daten"></dl>
+    <div id="sch-bekannt"></div>
+    <div class="sch-aktionen" id="sch-aktionen"></div>
+  </div>
+</div>
+
+</div>

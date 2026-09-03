@@ -1,0 +1,272 @@
+<title>Rotes Regal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ============================================================
+   ROTES REGAL — Zwei-Platten-Risodruck
+   Platte 1: Tinte (überdrucktes Schwarz)
+   Platte 2: Rot bzw. Federal Blue
+   Papier:   Zeitungsdruckpapier
+   ============================================================ */
+
+:root{
+  /* --- Tagauflage (hell) --- */
+  --papier:      #E9E5DA;
+  --papier-hoch: #F3F0E8;
+  --papier-tief: #DCD6C8;
+  --tinte:       #191713;
+  --tinte-mid:   #5C5648;
+  --tinte-hell:  #8E8776;
+  --rot:         #D3303D;
+  --rot-tief:    #A8232E;
+  --blau:        #2C4C7C;
+  --linie:       #C6BEAB;
+  --linie-zart:  #D6CFBE;
+  --schatten:    rgba(25,23,19,.16);
+
+  --f-plakat: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-lese:   "Newsreader", Georgia, "Times New Roman", serif;
+  --f-karte:  "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --rand: clamp(16px, 4vw, 48px);
+  --breit: 1280px;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --papier:      #14151A;
+    --papier-hoch: #1D1F27;
+    --papier-tief: #0D0E12;
+    --tinte:       #E8E4D9;
+    --tinte-mid:   #A6A091;
+    --tinte-hell:  #857F6E;
+    --rot:         #FF5C68;
+    --rot-tief:    #E13D4C;
+    --blau:        #7FA3DC;
+    --linie:       #2F333D;
+    --linie-zart:  #22252C;
+    --schatten:    rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --papier:      #14151A;
+  --papier-hoch: #1D1F27;
+  --papier-tief: #0D0E12;
+  --tinte:       #E8E4D9;
+  --tinte-mid:   #A6A091;
+  --tinte-hell:  #857F6E;
+  --rot:         #FF5C68;
+  --rot-tief:    #E13D4C;
+  --blau:        #7FA3DC;
+  --linie:       #2F333D;
+  --linie-zart:  #22252C;
+  --schatten:    rgba(0,0,0,.5);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+body{
+  margin:0;
+  background: var(--papier);
+  color: var(--tinte);
+  font-family: var(--f-lese);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Papierfaser: sehr feines Rauschen, damit die Fläche nicht digital wirkt */
+body::before{
+  content:""; position: fixed; inset:0; z-index:0; pointer-events:none;
+  opacity:.5; mix-blend-mode: multiply;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.018) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.014) 0 1px, transparent 1px 4px);
+}
+:root[data-theme="dark"] body::before{ mix-blend-mode: screen; opacity:.35; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body::before{ mix-blend-mode: screen; opacity:.35; }
+}
+
+.huelle{ position: relative; z-index:1; }
+
+::selection{ background: var(--rot); color: var(--papier-hoch); }
+
+a{ color: inherit; }
+button{ font: inherit; color: inherit; }
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline: 2px solid var(--rot); outline-offset: 3px;
+}
+
+/* ---------- Typografische Grundtöne ---------- */
+.plakat{
+  font-family: var(--f-plakat);
+  font-variation-settings: "wdth" 118, "wght" 850;
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  line-height: .93;
+  text-wrap: balance;
+}
+.karte{
+  font-family: var(--f-karte);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.zahl{ font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   KOPF / MASTHEAD
+   ============================================================ */
+.masthead{
+  border-bottom: 3px solid var(--tinte);
+  padding: clamp(18px,3vw,30px) var(--rand) 0;
+  position: relative;
+  overflow: hidden;
+}
+.masthead-innen{ max-width: var(--breit); margin: 0 auto; }
+
+.laufzeile{
+  display:flex; justify-content:space-between; gap:16px;
+  border-bottom: 1px solid var(--linie);
+  padding-bottom: 8px; margin-bottom: 14px;
+  color: var(--tinte-mid);
+  flex-wrap: wrap;
+}
+.laufzeile b{ color: var(--tinte); font-weight:600; }
+
+.titelzeile{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.schild{
+  position: relative;
+  font-family: var(--f-plakat);
+  font-variation-settings: "wdth" 124, "wght" 900;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 9vw, 6.4rem);
+  line-height: .82;
+  letter-spacing: -.028em;
+  margin:0;
+  color: var(--tinte);
+}
+/* Passerversatz: die zweite Druckplatte sitzt minimal daneben */
+.schild::after{
+  content: attr(data-echo);
+  position: absolute; left:0; top:0;
+  color: var(--rot);
+  mix-blend-mode: multiply;
+  transform: translate(3px, 2px);
+  z-index:-1;
+  opacity:.9;
+  transition: transform .5s cubic-bezier(.2,.9,.25,1);
+}
+:root[data-theme="dark"] .schild::after{ mix-blend-mode: screen; opacity:.75; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .schild::after{ mix-blend-mode: screen; opacity:.75; }
+}
+.masthead:hover .schild::after{ transform: translate(7px, 4px); }
+
+.untertitel{
+  font-family: var(--f-lese);
+  font-style: italic;
+  font-size: clamp(.95rem, 1.5vw, 1.12rem);
+  color: var(--tinte-mid);
+  max-width: 40ch;
+  margin: 0 0 6px;
+}
+
+/* ---------- Ladentür-Navigation ---------- */
+.regalreiter{
+  display:flex; gap:0; margin-top: 22px;
+  border-top: 1px solid var(--linie);
+  overflow-x: auto; scrollbar-width: thin;
+}
+.reiter{
+  appearance:none; background:none; border:0;
+  border-right: 1px solid var(--linie);
+  padding: 13px 20px 12px;
+  font-family: var(--f-plakat);
+  font-variation-settings: "wdth" 100, "wght" 700;
+  text-transform: uppercase;
+  font-size: .78rem; letter-spacing: .06em;
+  color: var(--tinte-mid);
+  cursor: pointer; white-space: nowrap;
+  position: relative;
+  transition: color .18s ease, background .18s ease;
+}
+.reiter:first-child{ border-left: 1px solid var(--linie); }
+.reiter::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:4px;
+  background: var(--rot); transform: scaleY(0); transform-origin: bottom;
+  transition: transform .22s cubic-bezier(.2,.9,.25,1);
+}
+.reiter:hover{ color: var(--tinte); background: var(--papier-tief); }
+.reiter[aria-selected="true"]{ color: var(--tinte); background: var(--papier-hoch); }
+.reiter[aria-selected="true"]::after{ transform: scaleY(1); }
+.reiter .zaehler{
+  font-family: var(--f-karte); font-size: .62rem;
+  color: var(--tinte-hell); margin-left: 7px; letter-spacing:0;
+}
+
+/* ---------- Ticker: der tägliche Wühltisch ---------- */
+.ticker{
+  border-bottom: 1px solid var(--linie);
+  background: var(--papier-tief);
+  overflow:hidden; white-space:nowrap;
+  display:flex; align-items:center;
+}
+.ticker-marke{
+  flex:0 0 auto; padding: 7px 14px;
+  background: var(--rot); color:#fff;
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 92,"wght" 800;
+  text-transform: uppercase; font-size:.68rem; letter-spacing:.1em;
+  z-index:2;
+}
+.ticker-bahn{ overflow:hidden; flex:1 1 auto; }
+.ticker-lauf{
+  display:inline-flex; gap: 40px; padding: 7px 0 7px 24px;
+  animation: laufen 68s linear infinite;
+  font-family: var(--f-karte); font-size:.72rem; letter-spacing:.03em;
+  color: var(--tinte-mid);
+}
+.ticker:hover .ticker-lauf{ animation-play-state: paused; }
+.ticker-lauf i{ color: var(--rot); font-style:normal; }
+@keyframes laufen{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+
+/* ============================================================
+   SEITENGERÜST
+   ============================================================ */
+main{ max-width: var(--breit); margin: 0 auto; padding: 0 var(--rand) 100px; }
+.blatt[hidden]{ display:none !important; }
+
+.abschnitt{ margin-top: clamp(38px, 6vw, 62px); }
+.abschnitt-kopf{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:18px; flex-wrap:wrap;
+  border-bottom: 2px solid var(--tinte);
+  padding-bottom: 9px; margin-bottom: 22px;
+}
+.abschnitt-kopf h2{
+  font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 116,"wght" 830;
+  text-transform: uppercase;
+  font-size: clamp(1.35rem, 3.4vw, 2.05rem);
+  letter-spacing: -.018em; line-height:1;
+  margin:0;
+}
+.abschnitt-kopf h2 em{
+  font-style: normal; color: var(--rot);
+}
+.abschnitt-notiz{
+  font-family: var(--f-karte); font-size:.68rem;
+  letter-spacing:.08em; text-transform: uppercase;
+  color: var(--tinte-hell); text-align:right; line-height:1.6;
+}
+@media (max-width: 640px){ .abschnitt-notiz{ text-align:left; } }
+.vorspann{
+  font-size: 1.02rem; color: var(--tinte-mid);
+  max-width: 62ch; margin: -8px 0 24px;
+}
+</style>

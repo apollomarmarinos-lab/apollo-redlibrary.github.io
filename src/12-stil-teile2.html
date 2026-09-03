@@ -1,0 +1,208 @@
+<style>
+/* ============================================================
+   TAKTGEBER — was rotiert wann
+   ============================================================ */
+.taktgeber{
+  display:grid; gap:1px; background: var(--linie-zart);
+  border:1px solid var(--linie);
+  grid-template-columns: repeat(auto-fit, minmax(190px,1fr));
+}
+.takt{ background: var(--papier-hoch); padding: 15px 16px 14px; }
+.takt-kopf{ display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+.takt h4{
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 100,"wght" 780;
+  text-transform:uppercase; font-size:.82rem; letter-spacing:.02em; margin:0;
+}
+.takt p{ margin:0; font-size:.83rem; color: var(--tinte-mid); line-height:1.42; }
+.takt .naechst{
+  display:block; margin-top:9px; font-family: var(--f-karte);
+  font-size:.63rem; letter-spacing:.06em; text-transform:uppercase; color: var(--rot);
+}
+/* Zifferblatt: zeigt die Position im Zyklus */
+.zifferblatt{ flex:0 0 auto; }
+.zifferblatt circle.spur{ fill:none; stroke: var(--linie); stroke-width:3; }
+.zifferblatt circle.bogen{ fill:none; stroke: var(--rot); stroke-width:3; stroke-linecap:butt;
+  transform: rotate(-90deg); transform-origin: 50% 50%;
+  transition: stroke-dashoffset 1.1s cubic-bezier(.2,.9,.25,1); }
+.zifferblatt text{ font-family: var(--f-karte); font-size:8px; fill: var(--tinte-mid); }
+
+/* ============================================================
+   FILTER & KATALOG
+   ============================================================ */
+.werkzeugleiste{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  padding: 13px 0 16px; border-bottom:1px solid var(--linie); margin-bottom:20px;
+}
+.suchfeld{
+  flex: 1 1 230px; display:flex; align-items:center; gap:8px;
+  border:1px solid var(--linie); background: var(--papier-hoch); padding: 8px 12px;
+}
+.suchfeld input{
+  border:0; background:none; outline:none; width:100%;
+  font-family: var(--f-lese); font-size:.95rem; color: var(--tinte);
+}
+.suchfeld input::placeholder{ color: var(--tinte-hell); }
+.suchfeld span{ color: var(--tinte-hell); font-family: var(--f-karte); font-size:.8rem; }
+
+select.wahl{
+  appearance:none; border:1px solid var(--linie); background: var(--papier-hoch);
+  padding: 8px 30px 8px 11px; cursor:pointer;
+  font-family: var(--f-karte); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
+  color: var(--tinte);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+.knopf{
+  border:1px solid var(--tinte); background: var(--papier-hoch); cursor:pointer;
+  padding: 8px 14px; font-family: var(--f-karte); font-size:.68rem;
+  letter-spacing:.08em; text-transform:uppercase;
+  transition: background .15s ease, color .15s ease, transform .15s cubic-bezier(.2,.9,.25,1);
+}
+.knopf:hover{ background: var(--tinte); color: var(--papier-hoch); transform: translate(-1px,-1px); }
+.knopf.stark{ background: var(--rot); border-color: var(--rot); color:#fff; }
+.knopf.stark:hover{ background: var(--rot-tief); border-color: var(--rot-tief); color:#fff; }
+.knopf.leise{ border-color: var(--linie); color: var(--tinte-mid); }
+.knopf[aria-pressed="true"]{ background: var(--tinte); color: var(--papier-hoch); }
+
+.ergebniszeile{
+  font-family: var(--f-karte); font-size:.66rem; letter-spacing:.08em;
+  text-transform:uppercase; color: var(--tinte-hell); margin-bottom:14px;
+}
+.leermeldung{
+  border:1px dashed var(--linie); padding: 34px 24px; text-align:center;
+  color: var(--tinte-mid);
+}
+.leermeldung strong{ display:block; font-family: var(--f-plakat);
+  font-variation-settings:"wdth" 104,"wght" 800; text-transform:uppercase;
+  font-size:1.1rem; margin-bottom:6px; color: var(--tinte); }
+
+/* ============================================================
+   SCHUBLADE (Detail)
+   ============================================================ */
+.schublade{
+  position: fixed; inset: 0; z-index: 50;
+  display:flex; justify-content:flex-end;
+  pointer-events:none;
+}
+.schublade[hidden]{ display:none !important; }
+.schublade-schleier{
+  position:absolute; inset:0; background: var(--tinte); opacity:0;
+  transition: opacity .28s ease; pointer-events:auto; border:0; cursor: zoom-out;
+}
+.schublade.offen .schublade-schleier{ opacity:.42; }
+.schublade-blatt{
+  position:relative; pointer-events:auto;
+  width: min(520px, 100%); height:100%; overflow-y:auto;
+  background: var(--papier-hoch);
+  border-left: 3px solid var(--tinte);
+  transform: translateX(100%);
+  transition: transform .34s cubic-bezier(.24,.92,.3,1);
+  padding: 22px clamp(20px,4vw,32px) 60px;
+}
+.schublade.offen .schublade-blatt{ transform: none; }
+
+.sch-oben{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:18px; }
+.schliessen{
+  border:1px solid var(--linie); background:none; cursor:pointer;
+  width:34px; height:34px; font-size:1rem; line-height:1; flex:0 0 auto;
+  transition: background .15s ease, color .15s ease, transform .2s ease;
+}
+.schliessen:hover{ background: var(--rot); color:#fff; border-color: var(--rot); transform: rotate(90deg); }
+
+.sch-titel{
+  font-family: var(--f-plakat); font-variation-settings:"wdth" 112,"wght" 860;
+  text-transform: uppercase; font-size: clamp(1.6rem,4.6vw,2.3rem);
+  line-height:.95; letter-spacing:-.02em; margin: 4px 0 8px;
+}
+.sch-unter{ font-family: var(--f-lese); font-style:italic; color: var(--tinte-mid); margin:0 0 20px; font-size:1.02rem; }
+.sch-text{ font-size: 1.02rem; line-height:1.62; margin: 0 0 22px; }
+.sch-text::first-letter{
+  float:left; font-family: var(--f-plakat); font-variation-settings:"wdth" 108,"wght" 880;
+  font-size: 3.1rem; line-height:.78; padding: 4px 9px 0 0; color: var(--rot);
+}
+.datenblatt{ border-top: 2px solid var(--tinte); }
+.datenblatt div{
+  display:grid; grid-template-columns: 128px minmax(0,1fr); gap:12px;
+  padding: 9px 0; border-bottom: 1px solid var(--linie-zart);
+  font-size:.9rem;
+}
+.datenblatt dt{
+  font-family: var(--f-karte); font-size:.62rem; letter-spacing:.09em;
+  text-transform:uppercase; color: var(--tinte-hell); margin:0; padding-top:3px;
+}
+.datenblatt dd{ margin:0; }
+.bekannt-liste{ list-style:none; padding:0; margin: 4px 0 0; }
+.bekannt-liste li{ padding: 5px 0 5px 15px; position:relative; font-size:.92rem; border-bottom:1px solid var(--linie-zart); }
+.bekannt-liste li::before{ content:"—"; position:absolute; left:0; color: var(--rot); }
+.sch-aktionen{ display:flex; gap:8px; flex-wrap:wrap; margin-top:24px; }
+
+/* ============================================================
+   BESTAND BEARBEITEN
+   ============================================================ */
+.formular{ display:grid; gap:14px; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); align-items:start; }
+.feld{ display:flex; flex-direction:column; gap:5px; }
+.feld.weit{ grid-column: 1 / -1; }
+.feld label{
+  font-family: var(--f-karte); font-size:.62rem; letter-spacing:.09em;
+  text-transform:uppercase; color: var(--tinte-mid);
+}
+.feld input, .feld textarea, .feld select{
+  border:1px solid var(--linie); background: var(--papier-hoch); color: var(--tinte);
+  padding: 9px 11px; font-family: var(--f-lese); font-size:.95rem; outline:none;
+  border-radius:0;
+}
+.feld textarea{ min-height: 84px; resize: vertical; line-height:1.5; }
+.feld input:focus, .feld textarea:focus, .feld select:focus{ border-color: var(--rot); }
+.feld .hinweis{ font-size:.76rem; color: var(--tinte-hell); font-family: var(--f-karte); letter-spacing:.02em; text-transform:none; }
+
+.strangwahl{ display:flex; flex-wrap:wrap; gap:6px; }
+.strangwahl label{
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+  border:1px solid var(--linie); padding: 5px 9px 4px; background: var(--papier-hoch);
+  font-family: var(--f-karte); font-size:.63rem; letter-spacing:.05em; text-transform:uppercase;
+  transition: background .14s ease, border-color .14s ease;
+}
+.strangwahl label:has(input:checked){ background: var(--tinte); color: var(--papier-hoch); border-color: var(--tinte); }
+.strangwahl input{ accent-color: var(--rot); margin:0; }
+
+.bestandsliste{ display:flex; flex-direction:column; border-top:1px solid var(--linie); margin-top:8px; }
+.bestandszeile{
+  display:flex; align-items:center; gap:12px; padding:10px 6px;
+  border-bottom:1px solid var(--linie-zart); font-size:.92rem;
+}
+.bestandszeile .wer{ flex:1 1 auto; min-width:0; }
+.bestandszeile .wer b{ font-family: var(--f-plakat); font-variation-settings:"wdth" 100,"wght" 720; font-weight:normal; }
+.bestandszeile .wer span{ display:block; font-family:var(--f-karte); font-size:.6rem; letter-spacing:.07em; text-transform:uppercase; color: var(--tinte-hell); }
+.eigen-marke{ background: var(--blau); color:#fff; padding:2px 6px 1px; font-family:var(--f-karte); font-size:.53rem; letter-spacing:.1em; text-transform:uppercase; }
+
+.meldung{
+  border-left: 4px solid var(--rot); background: var(--papier-tief);
+  padding: 11px 14px; font-size:.9rem; margin-top:14px;
+  animation: einlegen .3s cubic-bezier(.2,.9,.25,1) both;
+}
+
+/* ============================================================
+   FUSS
+   ============================================================ */
+.ladenfuss{
+  border-top: 3px solid var(--tinte); margin-top: 70px;
+  padding: 26px var(--rand) 46px;
+}
+.ladenfuss-innen{
+  max-width: var(--breit); margin:0 auto;
+  display:flex; justify-content:space-between; gap:22px; flex-wrap:wrap;
+  font-family: var(--f-karte); font-size:.66rem; letter-spacing:.05em;
+  color: var(--tinte-hell); line-height:1.8;
+}
+.ladenfuss a{ color: var(--tinte-mid); }
+.ladenfuss-innen p{ margin:0; max-width: 52ch; }
+
+/* ---------- Bewegung sparsam ---------- */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+}
+</style>

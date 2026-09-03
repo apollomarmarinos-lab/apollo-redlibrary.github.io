@@ -132,6 +132,7 @@ button{ font: inherit; color: inherit; }
   padding-bottom: 8px; margin-bottom: 14px;
   color: var(--tinte-mid);
   flex-wrap: wrap;
+  align-items: center;
 }
 .laufzeile b{ color: var(--tinte); font-weight:600; }
 
@@ -338,6 +339,24 @@ main{ max-width: var(--breit); margin: 0 auto; padding: 0 var(--rand) 100px; }
 }
 .update-status.ok{ color: var(--rot); }
 .update-status.pending{ color: var(--tinte-mid); }
+.update-status.updating{ 
+  color: var(--blau);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Manual update button */
+#manual-update-btn{
+  margin-left: auto;
+}
+#manual-update-btn:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
 
 /* Toolbar */
 .werkzeugleiste{
@@ -395,6 +414,8 @@ select.wahl{
       <div class="laufzeile karte">
         <span><b id="date-display"></b></span>
         <span id="update-indicator" class="update-status pending">Update wird geprüft...</span>
+        <span id="next-update-time" class="update-status" style="display:none;"></span>
+        <button id="manual-update-btn" class="knopf" title="Bibliothek manuell aktualisieren">↻ Aktualisieren</button>
       </div>
       <div class="titelzeile">
         <div>
@@ -511,6 +532,9 @@ function initTabs() {
       document.getElementById(`tab-${tabId}`).hidden = false;
     });
   });
+  
+  // Add manual update button listener
+  document.getElementById('manual-update-btn').addEventListener('click', triggerManualUpdate);
 }
 
 async function loadData() {
@@ -585,17 +609,79 @@ async function checkUpdateStatus() {
       document.getElementById('last-update-time').textContent = updateTime.toLocaleString('de-DE');
       
       const indicator = document.getElementById('update-indicator');
+      const nextUpdateEl = document.getElementById('next-update-time');
+      
       if (latest.status === 'success' || latest.status === 'scheduled_update_completed') {
         indicator.textContent = `✓ Zuletzt aktualisiert: ${updateTime.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}`;
-        indicator.classList.remove('pending');
+        indicator.classList.remove('pending', 'updating');
         indicator.classList.add('ok');
+        
+        // Calculate and show next update time (assuming hourly updates)
+        const nextUpdate = new Date(updateTime.getTime() + 60 * 60 * 1000); // +1 hour
+        nextUpdateEl.textContent = `⏭ Nächstes Update: ${nextUpdate.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}`;
+        nextUpdateEl.style.display = 'inline';
+        nextUpdateEl.classList.remove('pending', 'updating', 'ok');
+      } else if (latest.status === 'running') {
+        indicator.textContent = '🔄 Bibliothek wird aktualisiert...';
+        indicator.classList.remove('pending', 'ok');
+        indicator.classList.add('updating');
+        nextUpdateEl.style.display = 'none';
       } else {
         indicator.textContent = '⚠ Letzte Aktualisierung hatte Probleme';
-        indicator.classList.remove('pending');
+        indicator.classList.remove('pending', 'updating');
+        nextUpdateEl.style.display = 'none';
       }
     }
   } catch (error) {
     console.error('Error checking update status:', error);
+  }
+}
+
+async function triggerManualUpdate() {
+  const btn = document.getElementById('manual-update-btn');
+  const indicator = document.getElementById('update-indicator');
+  
+  // Disable button and show updating state
+  btn.disabled = true;
+  indicator.textContent = '🔄 Bibliothek wird aktualisiert...';
+  indicator.classList.remove('pending', 'ok');
+  indicator.classList.add('updating');
+  
+  try {
+    const response = await fetch(`${API_BASE}/api/trigger-update`, { method: 'POST' });
+    
+    if (!response.ok) {
+      throw new Error('Update konnte nicht gestartet werden');
+    }
+    
+    // Poll for update status (max 30 seconds)
+    let attempts = 0;
+    const maxAttempts = 30;
+    
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await checkUpdateStatus();
+      
+      const currentStatus = await fetch(`${API_BASE}/api/update-status`);
+      const logs = await currentStatus.json();
+      
+      if (logs.length > 0 && logs[0].status !== 'running') {
+        break;
+      }
+      attempts++;
+    }
+    
+    // Reload data after update completes
+    if (attempts < maxAttempts) {
+      await loadData();
+    }
+    
+  } catch (error) {
+    console.error('Error triggering update:', error);
+    indicator.textContent = '⚠ Update fehlgeschlagen';
+    indicator.classList.remove('pending', 'updating');
+  } finally {
+    btn.disabled = false;
   }
 }
 
